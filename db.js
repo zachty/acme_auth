@@ -41,10 +41,9 @@ User.authenticate = async ({ username, password }) => {
     const user = await User.findOne({
         where: {
             username,
-            password,
         },
     });
-    if (user) {
+    if (bcrypt.compare(password, user.password)) {
         return jwt.sign({ userId: user.id }, process.env.JWT);
     }
     const error = Error('bad credentials');
@@ -55,6 +54,8 @@ User.authenticate = async ({ username, password }) => {
 const salt = 5;
 User.beforeCreate(async (user, options) => {
     user.password = await bcrypt.hash(user.password, salt);
+
+    //other options
     // user.password = bcrypt.hashSync(user.password, salt);
     // await bcrypt.hash(user.password, salt).then(function (hash) {
     //     user.password = hash;
