@@ -24,6 +24,15 @@ app.get('/api/auth', async (req, res, next) => {
     }
 });
 
+app.get('/api/users/:id/notes', async (req, res, next) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        res.send(await user.getNotes());
+    } catch (ex) {
+        next(ex);
+    }
+});
+
 app.use((err, req, res, next) => {
     console.log(err);
     res.status(err.status || 500).send({ error: err.message });
