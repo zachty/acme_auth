@@ -19,6 +19,10 @@ const User = conn.define('user', {
     password: STRING,
 });
 
+const Note = conn.define('note', {
+    text: STRING,
+});
+
 User.byToken = async token => {
     try {
         const user = await User.findByPk(
@@ -62,17 +66,33 @@ User.beforeCreate(async (user, options) => {
     // });
 });
 
+Note.belongsTo(User);
+User.hasMany(Note);
+
 const syncAndSeed = async () => {
     await conn.sync({ force: true });
     const credentials = [
         { username: 'lucy', password: 'lucy_pw' },
         { username: 'moe', password: 'moe_pw' },
         { username: 'larry', password: 'larry_pw' },
-        { username: 'joe', password: 'joe_pw' },
     ];
+    const notes = [
+        { text: 'hey', userId: 1 },
+        { text: 'hi', userId: 1 },
+        { text: 'note3', userId: 2 },
+        { text: 'who dun it', userId: 3 },
+        { text: 'idk', userId: 3 },
+    ];
+
     const [lucy, moe, larry] = await Promise.all(
         credentials.map(credential => User.create(credential))
     );
+    const [a, b, c, d, e] = await Promise.all(
+        notes.map(note => Note.create(note))
+    );
+
+    console.log(a);
+
     return {
         users: {
             lucy,
