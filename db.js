@@ -90,9 +90,6 @@ const syncAndSeed = async () => {
     const [a, b, c, d, e] = await Promise.all(
         notes.map(note => Note.create(note))
     );
-
-    console.log(a);
-
     return {
         users: {
             lucy,
