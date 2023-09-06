@@ -27,7 +27,8 @@ app.get('/api/auth', async (req, res, next) => {
 app.get('/api/users/:id/notes', async (req, res, next) => {
     try {
         const user = await User.findByPk(req.params.id);
-        res.send(await user.getNotes());
+        if (user) res.send(await user.getNotes());
+        else throw new Error('no user found');
     } catch (ex) {
         next(ex);
     }
