@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const { STRING } = Sequelize;
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const config = {
     logging: false,
 };
@@ -51,12 +52,22 @@ User.authenticate = async ({ username, password }) => {
     throw error;
 };
 
+const salt = 5;
+User.beforeCreate(async (user, options) => {
+    user.password = await bcrypt.hash(user.password, salt);
+    // user.password = bcrypt.hashSync(user.password, salt);
+    // await bcrypt.hash(user.password, salt).then(function (hash) {
+    //     user.password = hash;
+    // });
+});
+
 const syncAndSeed = async () => {
     await conn.sync({ force: true });
     const credentials = [
         { username: 'lucy', password: 'lucy_pw' },
         { username: 'moe', password: 'moe_pw' },
         { username: 'larry', password: 'larry_pw' },
+        { username: 'joe', password: 'joe_pw' },
     ];
     const [lucy, moe, larry] = await Promise.all(
         credentials.map(credential => User.create(credential))
